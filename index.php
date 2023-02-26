@@ -1,5 +1,12 @@
+
+<form method="post" action="index.php">
+  <label for="data">Selecione a data:</label>
+  <input type="date" id="data" name="data">
+  <input type="submit" value="Visualizar">
+</form>
+
 <?php
-// Iniciar a sessão
+
 session_start();
 if (isset($_SESSION["success_message"])) {
     echo $_SESSION["success_message"];
@@ -12,8 +19,9 @@ if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
     exit();
 }
-
 // Conectar ao banco de dados MySQL
+
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -25,12 +33,37 @@ if ($conn->connect_error) {
     die("Falha na conexão com o banco de dados: " . $conn->connect_error);
 }
 
-echo "<h2>Incluir Contribuição</h2>";
+// Coletar a data selecionada pelo mensageiro
+if (isset($_POST["data"])) {
+    $data = $_POST["data"];
+} else {
+    // Se a data não foi selecionada, usar a data atual
+    $data = date("Y-m-d");
+}
+
+// Consultar os recibos correspondentes à data selecionada
+$sql = "SELECT recibo, valor, data_prevista, status FROM contribuicao WHERE data_prevista = '$data'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Exibir os recibos em uma tabela
+    echo "<table><tr><th>Recibo</th><th>Valor</th><th>Data Prevista</th><th>Status</th>";
+    while($row = $result->fetch_assoc()) {
+        echo "<tr><td>" . $row["recibo"] . "</td><td>" . $row["valor"] . "</td><td>" . $row["data_prevista"] . "</td><td>" . $row["status"] . "</td><td>" . "</td></tr>";
+    }
+    echo "</table>";
+} else {
+    echo "Não há recibos para a data selecionada.";
+}
+
+// Fechar a conexão com o banco de dados
+
+// Iniciar a sessão
+
+
 // Processar o envio do formulário de busca
 
     // Obter o número do recibo fornecido pelo formulário de busca
-
-    if ($_SERVER["REQUEST_METHOD"] == "GET") {
         echo "<h2>Buscar Contribuição</h2>";
         echo "<form method='GET' action=''>";
         echo "<label for='numero-recibo'>Número do Recibo:</label>";
@@ -68,6 +101,7 @@ echo "<h2>Incluir Contribuição</h2>";
                     echo "<p>Tipo de Pagamento: " . $row['nome_tipo_pagamento'] . "</p>";
                     echo "<p>Status: " . $row['status'] . "</p>";
                     echo "<p>Contribuinte: " . $row['nome_contribuinte'] . "</p>";
+                    echo "<a href='visualizar_detalhes.php?contribuinte_id=" . $row['id_contribuinte'] . "' target='_blank'>Visualizar Detalhes</a>";
                     
                     // Adicionar o formulário de alteração de status e data de recebimento
                     echo "<h3>Alterar Status e Data de Recebimento</h3>";
@@ -85,7 +119,7 @@ echo "<h2>Incluir Contribuição</h2>";
                     echo "<br><br>";
                     echo "<input type='submit' name='submit' value='Alterar'>";
                     echo "</form>";
-                    echo "<a href='visualizar_detalhes.php?contribuinte_id=" . $row['id_contribuinte'] . "' target='_blank'>Visualizar Detalhes</a>";
+                    
             
                 } else {
                     echo "Contribuição não encontrada.";
@@ -95,50 +129,60 @@ echo "<h2>Incluir Contribuição</h2>";
     }
 
 
-    }
+
 
         
         
-    // Processar o envio do formulário de alteração de status e data de recebimento
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["submit"]) && $_POST["submit"] == "Alterar" && isset($_POST["recibo"])) {
-        // Obter as informações fornecidas pelo formulário de alteração de status e data de recebimento
-        $recibo = $_POST["recibo"];
-        $status = $_POST["status"];
-        $data_recebimento = $_POST["data-recebimento"];
-    
-        // Verificar se todos os campos obrigatórios foram preenchidos
-        if (empty($status) || empty($data_recebimento)) {
-            echo "Por favor, preencha todos os campos.";
+// Processar o envio do formulário de alteração de status e data de recebimento
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["submit"]) && $_POST["submit"] == "Alterar" && isset($_POST["recibo"])) {
+    // Obter as informações fornecidas pelo formulário de alteração de status e data de recebimento
+    $recibo = $_POST["recibo"];
+    $status = $_POST["status"];
+    $data_recebimento = $_POST["data-recebimento"];
+
+    // Verificar se todos os campos obrigatórios foram preenchidos
+    if (empty($status) || empty($data_recebimento)) {
+        echo "Por favor, preencha todos os campos.";
+    } else {
+        // Verificar se o valor do status é válido
+        if (!in_array($status, array("Pendente", "Recebido", "Cancelado"))) {
+            echo "O valor do status é inválido.";
         } else {
-            // Verificar se o valor do status é válido
-            if (!in_array($status, array("Pendente", "Recebido", "Cancelado"))) {
-                echo "O valor do status é inválido.";
+            // Verificar se o valor da data de recebimento está em um formato válido
+            $date = DateTime::createFromFormat('Y-m-d', $data_recebimento);
+            if (!$date) {
+                echo "O valor da data de recebimento é inválido.";
             } else {
-                // Verificar se o valor da data de recebimento está em um formato válido
-                $date = DateTime::createFromFormat('Y-m-d', $data_recebimento);
-                if (!$date) {
-                    echo "O valor da data de recebimento é inválido.";
-                } else {
-                    // Atualizar a contribuição correspondente na tabela "contribuicao"
-                    $sql = "UPDATE contribuicao SET status = '$status' WHERE recibo = '$recibo'";
-                    if ($conn->query($sql) === TRUE) {
+                // Atualizar a contribuição correspondente na tabela "contribuicao"
+                $sql = "UPDATE contribuicao SET status = '$status' WHERE recibo = '$recibo'";
+                if ($conn->query($sql) === TRUE) {
+                    // Atualizar o movimento diário correspondente na tabela "movimento_diario"
+                    
+                    // Inserir um novo registro na tabela "movimento_diario"
+                    $sql1 = "INSERT INTO movimento_diario (recibo, status, data_recebimento) VALUES ('$recibo', '$status', '$data_recebimento')";
+                    if ($conn->query($sql1) === TRUE) {
                         // Exibir a mensagem de sucesso e redirecionar para a página inicial
                         session_start();
                         $_SESSION["success_message"] = "<p>Contribuição atualizada com sucesso.</p>";
                         header("Location: index.php");
                         exit; // Importante sair do script depois de redirecionar
                     } else {
-                        echo "Erro ao atualizar a contribuição: " . $conn->error;
+                        echo "Erro ao inserir o movimento diário: " . $conn->error;
+                    
+
                     }
+                } else {
+                    echo "Erro ao atualizar a contribuição: " . $conn->error;
                 }
             }
         }
-    
-    
-        
+    }
 }
+
 // Fechar a conexão com o banco de dados MySQL
 
 $conn->close();
+
     
 ?>
+<a href="logout.php">Sair</a>
