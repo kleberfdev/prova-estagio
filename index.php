@@ -40,11 +40,7 @@ if (!isset($_POST['data'])) {
 echo "<form>";
 // Salva a última data na sessão
 $_SESSION['data'] = $lastDate;
-if (isset($_SESSION["success_message"])) {
-    echo $_SESSION["success_message"];
-    unset($_SESSION["success_message"]);
-}
-echo "</form>";
+
 ?>
 
 
@@ -235,8 +231,13 @@ if ($conn->query($sql) === TRUE) {
     echo "Erro ao atualizar a contribuição: " . $conn->error;
     exit;
 }
-}
 
+}
+if (isset($_SESSION["success_message"])) {
+    echo $_SESSION["success_message"];
+    unset($_SESSION["success_message"]);
+}
+echo "</form>";
 // Fechar a conexão com o banco de dados MySQL
 
 $conn->close();
