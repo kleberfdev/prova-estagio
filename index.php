@@ -145,6 +145,7 @@ if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
             
                 if ($result->num_rows > 0) {
+                    
                     // Exibir os dados da contribuição
                     // Atribuir o resultado da consulta à variável $row
                     echo "<form><h2>Dados da Contribuição</h2>";
@@ -156,6 +157,12 @@ if ($result->num_rows > 0) {
                     echo "<p>Status: " . $row['status'] . "</p>";
                     echo "<p>Contribuinte: " . $row['nome_contribuinte'] . "</p>";
                     echo "<br><a href='visualizar_detalhes.php?contribuinte_id=" . $row['id_contribuinte'] . "' target='_blank' class='botao'>Visualizar Detalhes</a>";
+                    if ($row["status"] == "recebido") {
+                        echo "<td><a href='gerar_pdf.php?recibo=".$row["recibo"]."' target='_blank'>Imprimir PDF</a></td>";
+                      } else {
+                        echo "<td>N/A</td>";
+                      }
+                      
                     echo "</form>";
                     
                     

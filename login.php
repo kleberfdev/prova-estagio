@@ -35,7 +35,7 @@ if ($result->num_rows == 1) {
     // Credenciais de login válidas, obter o id do usuário e redirecionar para a página principal
     $row = $result->fetch_assoc();
     session_start();
-    $_SESSION['Mensageiro'] = $username;
+    $_SESSION['usuario'] = $username;
     $_SESSION['id_usuario'] = $row['id'];
     header("Location: index.php");
     exit();
