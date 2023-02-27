@@ -243,6 +243,7 @@ echo "</form>";
 $conn->close();
  
 ?>
+<form>
 <a href="logout.php">Sair</a>
 </body>
 </html>
