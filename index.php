@@ -1,12 +1,20 @@
-
-<form method="post" action="index.php">
-  <label for="data">Selecione a data:</label>
-  <input type="date" id="data" name="data">
-  <input type="submit" value="Visualizar">
-</form>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <form method="post" action="index.php">
+    <form for = pesqdata><h2>Recibos</h2></label>
+    <label for="data">Selecione a data:</label>
+    <input type="date" id="data" name="data">
+    <input type="submit" value="Visualizar">    
+</form>   
+</head>
+<body>
 <?php
-
+date_default_timezone_set('America/Sao_Paulo');
 session_start();
 if (isset($_SESSION["success_message"])) {
     echo $_SESSION["success_message"];
@@ -39,6 +47,7 @@ if (isset($_POST["data"])) {
 } else {
     // Se a data não foi selecionada, usar a data atual
     $data = date("Y-m-d");
+    echo date("y-m-d");
 }
 
 // Consultar os recibos correspondentes à data selecionada
@@ -49,12 +58,13 @@ if ($result->num_rows > 0) {
     // Exibir os recibos em uma tabela
     echo "<table><tr><th>Recibo</th><th>Valor</th><th>Data Prevista</th><th>Status</th>";
     while($row = $result->fetch_assoc()) {
-        echo "<tr><td>" . $row["recibo"] . "</td><td>" . $row["valor"] . "</td><td>" . $row["data_prevista"] . "</td><td>" . $row["status"] . "</td><td>" . "</td></tr>";
+      echo "<tr><td>" . $row["recibo"] . "</td><td>" . $row["valor"] . "</td><td>" . $row["data_prevista"] . "</td><td>" . $row["status"] . "</td><td>" . "</td></tr>";
     }
     echo "</table>";
-} else {
-    echo "Não há recibos para a data selecionada.";
-}
+  } else {
+    echo "<div class='error-message'>Não há recibos para a data selecionada.</div>";
+  }
+  
 
 // Fechar a conexão com o banco de dados
 
@@ -64,8 +74,9 @@ if ($result->num_rows > 0) {
 // Processar o envio do formulário de busca
 
     // Obter o número do recibo fornecido pelo formulário de busca
-        echo "<h2>Buscar Contribuição</h2>";
+        
         echo "<form method='GET' action=''>";
+        echo "<label for='busccontri'><h2>Buscar Contribuição</h2></label>";
         echo "<label for='numero-recibo'>Número do Recibo:</label>";
         echo "<input type='text' name='numero-recibo' id='numero-recibo'>";
         echo "<br><br>";
@@ -101,10 +112,10 @@ if ($result->num_rows > 0) {
                     echo "<p>Tipo de Pagamento: " . $row['nome_tipo_pagamento'] . "</p>";
                     echo "<p>Status: " . $row['status'] . "</p>";
                     echo "<p>Contribuinte: " . $row['nome_contribuinte'] . "</p>";
-                    echo "<a href='visualizar_detalhes.php?contribuinte_id=" . $row['id_contribuinte'] . "' target='_blank'>Visualizar Detalhes</a>";
+                    echo "<br><a href='visualizar_detalhes.php?contribuinte_id=" . $row['id_contribuinte'] . "' target='_blank'>Visualizar Detalhes</a>";
                     
                     // Adicionar o formulário de alteração de status e data de recebimento
-                    echo "<h3>Alterar Status e Data de Recebimento</h3>";
+                    echo "<h3><br>Alterar Status e Data de Recebimento</h3>";
                     echo "<form method='POST' action=''>";
                     echo "<input type='hidden' name='recibo' value='" . $row["recibo"] . "'>";
                     echo "<label for='status'>Status:</label>";
@@ -122,7 +133,7 @@ if ($result->num_rows > 0) {
                     
             
                 } else {
-                    echo "Contribuição não encontrada.";
+                    echo "<div class='error-message'>Contribuição não encontrada.</div>";
                 }
             }
             
@@ -186,3 +197,5 @@ $conn->close();
     
 ?>
 <a href="logout.php">Sair</a>
+</body>
+</html>
