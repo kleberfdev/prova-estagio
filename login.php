@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,14 +26,17 @@ $username = $_POST["username"];
 $password = $_POST["password"];
 
 // Consultar o banco de dados para verificar se as credenciais de login são válidas
+// Consultar o banco de dados para verificar se as credenciais de login são válidas
 $sql = "SELECT * FROM mensageiro WHERE nome = '$username' AND senha = '$password'";
 $result = $conn->query($sql);
 
 // Verificar se o resultado da consulta retornou um registro
 if ($result->num_rows == 1) {
-    // Credenciais de login válidas, redirecionar para a página principal
+    // Credenciais de login válidas, obter o id do usuário e redirecionar para a página principal
+    $row = $result->fetch_assoc();
     session_start();
-    $_SESSION['usuario'] = $username;
+    $_SESSION['Mensageiro'] = $username;
+    $_SESSION['id_usuario'] = $row['id'];
     header("Location: index.php");
     exit();
 } else {
@@ -41,12 +44,13 @@ if ($result->num_rows == 1) {
     $error_message = "Nome de usuário ou senha incorretos.";
 }
 
+
 // Fechar a conexão com o banco de dados
 $conn->close();
 }
 ?>
 
-<h1>Login</h1>
+<h1><form>Login</form></h1>
 <?php
 // Verifica se a mensagem de sucesso está definida na sessão
 session_start();
@@ -66,12 +70,14 @@ if(isset($_SESSION["success_message"])) {
     <?php } ?>
     <br>
     <input type="submit" value="Entrar">
-</form>
+
 <p>Não tem cadastro? <a href="cadastro.php">Cadastre-se</a>.</p>
 <?php
 if(isset($_GET['cadastro']) && $_GET['cadastro'] == 'sucesso') {
     echo "<p>Cadastro realizado com sucesso. Faça o seu login.</p>";
 }
+
 ?>
+</form>
 </body>
 </html>
