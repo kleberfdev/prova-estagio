@@ -19,7 +19,13 @@ if ($conn->connect_error) {
 }
 
 // Selecionar as informações do recibo no banco de dados
-$sql = "SELECT * FROM movimento_diario WHERE recibo = $recibo";
+
+$sql = "SELECT md.recibo, md.valor, md.data_prevista, md.data_recebimento, md.status, 
+               c.nome AS nome_contribuinte
+        FROM movimento_diario md
+        INNER JOIN contribuinte c ON md.recibo = c.id
+        WHERE md.recibo = $recibo";
+
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -33,6 +39,8 @@ if ($result->num_rows > 0) {
     $pdf->Ln();
     $pdf->SetFont('Arial','',12);
     $pdf->Cell(40,10,'Recibo: '.$row["recibo"]);
+    $pdf->Ln();
+    $pdf->Cell(40,10,'Nome do Contribuinte: '.$row["nome_contribuinte"]);
     $pdf->Ln();
     $pdf->Cell(40,10,'Valor: R$ '.$row["valor"]);
     $pdf->Ln();
