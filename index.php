@@ -37,9 +37,14 @@ if (!isset($_POST['data'])) {
   // Se o formulário for enviado, mantém o valor atual do campo de data do formulário
   $lastDate = $_POST['data'];
 }
-
+echo "<form>";
 // Salva a última data na sessão
 $_SESSION['data'] = $lastDate;
+if (isset($_SESSION["success_message"])) {
+    echo $_SESSION["success_message"];
+    unset($_SESSION["success_message"]);
+}
+echo "</form>";
 ?>
 
 
@@ -50,10 +55,7 @@ $_SESSION['data'] = $lastDate;
     <input type="submit" value="Visualizar">    
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-if (isset($_SESSION["success_message"])) {
-    echo $_SESSION["success_message"];
-    unset($_SESSION["success_message"]);
-}
+
 
 // Verificar se o usuário não está autenticado
 if (!isset($_SESSION['usuario'])) {

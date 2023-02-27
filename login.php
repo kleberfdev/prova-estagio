@@ -61,7 +61,7 @@ if(isset($_SESSION["success_message"])) {
 }
 ?>
 <form method="post" action="login.php">
-    <label for="username">Nome de usuário:</label>
+    <label for="username">Mensageiro:</label>
     <input type="text" id="username" name="username"><br>
     <label for="password">Senha:</label>
     <input type="password" id="password" name="password">
