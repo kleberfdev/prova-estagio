@@ -26,20 +26,7 @@ if (isset($_SESSION['usuario'])) {
 }
 
 
-if (!isset($_POST['data'])) {
-  // Se o formulário não for enviado, armazena a última data na sessão
-  if (isset($_SESSION['data'])) {
-    $lastDate = $_SESSION['data'];
-  } else {
-    $lastDate = date('Y-m-d');
-  }
-} else {
-  // Se o formulário for enviado, mantém o valor atual do campo de data do formulário
-  $lastDate = $_POST['data'];
-}
-echo "<form>";
-// Salva a última data na sessão
-$_SESSION['data'] = $lastDate;
+
 
 ?>
 
@@ -47,7 +34,14 @@ $_SESSION['data'] = $lastDate;
 <form method="post">
     <label><h2>Recibos</h2></label>
     <label for="data">Selecione a data:</label>
-    <input type="date" id="data" name="data" value="<?php echo isset($_SESSION['data']) ? $_SESSION['data'] : date("Y-m-d"); ?>">
+    <?php
+    if (isset($_POST['data'])) {
+        $data = $_POST['data'];
+    } else {
+        $data = date("Y-m-d");
+    }
+?>
+<input type="date" id="data" name="data" value="<?php echo $data; ?>">
     <input type="submit" value="Visualizar">    
 <?php
 date_default_timezone_set('America/Sao_Paulo');
