@@ -70,10 +70,13 @@ if ($conn->connect_error) {
 // Coletar a data selecionada pelo mensageiro
 if (isset($_POST["data"])) {
     $data = $_POST["data"];
-} else {
-    // Se a data não foi selecionada, usar a data atual
-    $data = date("Y-m-d");
-    echo "<form><h3><br>Recibos De Hoje</h3>";
+    $dataf = date("d/m/Y", strtotime($data));
+    $datah = date("d/m/Y");
+    if ($dataf == $datah){
+        echo "<form><h3><br>Recibos De Hoje</h3>";
+    }else{
+        echo "<form><h3><br>Recibos De $dataf</h3>";
+    }
 }
 
 // Consultar os recibos correspondentes à data selecionada
@@ -82,22 +85,13 @@ $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // Exibir os recibos em uma tabela
-    
-    if (isset($_POST["data"])) {
-        $data = $_POST["data"];
-        $dataf = date("d/m/Y", strtotime($data));
-        $datah = date("d/m/Y");
-        if ($dataf == $datah){
-            echo "<form><h3><br>Recibos De Hoje</h3>";
-        }else{
-            echo "<form><h3><br>Recibos De $dataf</h3>";
-        }
+    if (!isset($_POST["data"])){
+        echo "<form><h3><br>Recibos De Hoje</h3>";
     }
     echo "<table><tr><th>Recibo</th><th>Valor</th><th>Data Prevista</th><th>Status</th>";
     while($row = $result->fetch_assoc()) {
         echo "<tr><td>" . $row["recibo"] . "</td><td>" . $row["valor"] . "</td><td>" . date('d/m/Y', strtotime($row["data_prevista"])) . "</td><td>" . $row["status"] ;
     }
-
     echo "</table>";
   } else {
     echo "<div class='error-message'>Não há recibos para a data selecionada.</div>";
