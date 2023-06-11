@@ -229,7 +229,7 @@ echo "</form>";
 // Fechar a conexão com o banco de dados MySQL
 
 $conn->close();
- 
+// 
 ?>
 <form>
 <a href="logout.php">Sair</a>
