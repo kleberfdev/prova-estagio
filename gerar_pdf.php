@@ -21,9 +21,10 @@ if ($conn->connect_error) {
 // Selecionar as informações do recibo no banco de dados
 
 $sql = "SELECT md.recibo, md.valor, md.data_prevista, md.data_recebimento, md.status, 
-               c.nome AS nome_contribuinte
+               co.nome AS nome_contribuinte, c.id_contribuinte
         FROM movimento_diario md
-        INNER JOIN contribuinte c ON md.recibo = c.id
+        INNER JOIN contribuicao c ON md.recibo = c.recibo
+        INNER JOIN contribuinte co ON c.id_contribuinte = co.id
         WHERE md.recibo = $recibo";
 
 $result = $conn->query($sql);
